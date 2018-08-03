@@ -43,7 +43,6 @@
 				$("#submit_items").click(function(e){
 					e.preventDefault();
 
-          var found_items = [];
           var db = new Dexie("itemfinder");
 
           db.version(1).stores({
@@ -51,25 +50,33 @@
           });
 					$('#items_needed').hide();
 					var lines = $('#itemlist').val().split(/\n/);
+
+					var items = [];
+
+					// Loop through the lines submitted and pre-fill the table with the item not existing. #fkitbaylife
 					for (var i=0; i < lines.length; i++) {
 					  if (/\S/.test(lines[i])) {
 							var item_name = $.trim(lines[i]).replace('.', '');
 
-							db.items.get(item_name, function(response) {
-                if(response !== null) {
-                  found_items.push(response.name);
-                  console.log(response);
-									$('#items_needed tbody').append(
-										'<tr>' +
-											'<td>' + response.name+'</td>'+
-											'<td>' + response.carried_by + '</td>'+
-											'<td>' + response.area + '</td>'+
-										'</tr>'
-									);
-								}
-							});
+							items.push(item_name);
+							$('#items_needed tbody').append(
+							  '<tr class="not_found" data-item="'+item_name+'">'+
+									'<td colspan="3">\''+item_name+'\' DOES NOT EXIST IN THE DATABASE</td>'+
+								'</tr>'
+							);
 					  }
 					}
+
+          db.items.where('name').anyOf(items).each(function(item) {
+            $("tr[data-item='" + item.name + "']").replaceWith(
+              '<tr>'+
+								'<td>'+item.name+'</td>'+
+								'<td>'+item.carried_by+'</td>'+
+								'<td>'+item.area+'</td>'+
+              '</tr>'
+						);
+          });
+
 					$('#items_needed').show();
 				});
 			

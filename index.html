@@ -22,12 +22,13 @@
 				<div class="button" id="submit_items">Locate Items</div>
 			</div>
 			<div id="items_needed">
+				<p>Don't see your item below? That means it's missing from the database. <a href="https://docs.google.com/forms/d/e/1FAIpQLSfUPhuczSur_dLu2_ZkRu1CIr-Y9K91Sv3JAmzIRsNSVEB25A/viewform?usp=sf_link" target="_blank">Add it now!</a></p>
 				<table cellpadding="3" cellspacing="3" border="">
 					<thead>
 						<tr>
 							<th>item name</th>
+							<th>carried by</th>
 							<th>area</th>
-							<th>directions</th>
 						</tr>
 					</thead>
 					<tbody></tbody>
@@ -52,27 +53,21 @@
 					var lines = $('#itemlist').val().split(/\n/);
 					for (var i=0; i < lines.length; i++) {
 					  if (/\S/.test(lines[i])) {
-						var item_name = $.trim(lines[i]).replace('.', '');
-              db.items.get(item_name, function(response) {
-                if(response !== null){
+							var item_name = $.trim(lines[i]).replace('.', '');
+
+							db.items.get(item_name, function(response) {
+                if(response !== null) {
                   found_items.push(response.name);
+                  console.log(response);
 									$('#items_needed tbody').append(
 										'<tr>' +
-                    '<td>' + response.name+'</td>'+
-                    '<td>' + response.carried_by + '</td>'+
-                    '<td>' + response.area + '</td>'+
+											'<td>' + response.name+'</td>'+
+											'<td>' + response.carried_by + '</td>'+
+											'<td>' + response.area + '</td>'+
 										'</tr>'
 									);
 								}
 							});
-              if($.inArray(item_name, found_items) < 0) {
-                $('#items_needed tbody').append(
-                  '<tr class="not_found">' +
-                  '<td>' + item_name+'</td>'+
-                  '<td colspan="2"> <a href="https://docs.google.com/forms/d/e/1FAIpQLSfUPhuczSur_dLu2_ZkRu1CIr-Y9K91Sv3JAmzIRsNSVEB25A/viewform?usp=sf_link" target="_blank">NOT FOUND - Add it to the database</a>!</td>' +
-                  '</tr>'
-                );
-              }
 					  }
 					}
 					$('#items_needed').show();
@@ -128,8 +123,8 @@
 		</script>
 
 		<script async defer src="https://apis.google.com/js/api.js"
-						onload="this.onload=function(){};handleClientLoad()"
-						onreadystatechange="if (this.readyState === 'complete') this.onload()">
+				onload="this.onload=function(){};handleClientLoad()"
+				onreadystatechange="if (this.readyState === 'complete') this.onload()">
 		</script>
 	</body>
 </html>
